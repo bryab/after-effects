@@ -5,6 +5,7 @@ export AESDK_ROOT := if env("AESDK_ROOT", "") == "" { justfile_directory() / "..
 export PRSDK_ROOT := if env("PRSDK_ROOT", "") == "" { justfile_directory() / "../../sdk/Premiere Pro 22.0 C++ SDK" } else { env_var("PRSDK_ROOT") }
 
 [windows]
+[no-cd]
 build:
     cargo build
     if (-not $env:NO_INSTALL) { \
@@ -12,6 +13,7 @@ build:
     }
 
 [windows]
+[no-cd]
 release:
     cargo build --release
     Copy-Item -Force '{{TargetDir}}\release\{{BinaryName}}.dll' '{{TargetDir}}\release\{{PluginName}}.aex'
@@ -20,16 +22,19 @@ release:
     }
 
 [macos]
+[no-cd]
 build:
     cargo build
     just -f {{justfile()}} create_bundle debug {{TargetDir}}
 
 [macos]
+[no-cd]
 release:
     cargo build --release
     just -f {{justfile()}} create_bundle release {{TargetDir}}
 
 [macos]
+[no-cd]
 create_bundle profile TargetDir:
     #!/bin/bash
     set -e
@@ -61,7 +66,7 @@ create_bundle profile TargetDir:
 
     # codesign with the first development cert we can find using its hash
     if [ -z "$NO_SIGN" ]; then
-        codesign --options runtime --timestamp -strict  --sign $( security find-identity -v -p codesigning | grep -m 1 "Apple Development" | awk -F ' ' '{print $2}' ) {{TargetDir}}/{{profile}}/{{PluginName}}.plugin
+ codesign --options runtime --timestamp -strict  --sign $( security find-identity -v -p codesigning | grep -m 1 "Apple Development" | awk -F ' ' '{print $2}' ) {{TargetDir}}/{{profile}}/{{PluginName}}.plugin
     fi
 
     # Install
