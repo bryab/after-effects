@@ -66,7 +66,7 @@ create_bundle profile TargetDir:
 
     # codesign with the first development cert we can find using its hash
     if [ -z "$NO_SIGN" ]; then
- codesign --options runtime --timestamp -strict  --sign $( security find-identity -v -p codesigning | grep -m 1 "Apple Development" | awk -F ' ' '{print $2}' ) {{TargetDir}}/{{profile}}/{{PluginName}}.plugin
+        codesign --options runtime --timestamp -strict  --sign $(security find-identity -v -p codesigning | grep "Apple Development" | tail -1 | awk -F ' ' '{print $2}' ) {{TargetDir}}/{{profile}}/{{PluginName}}.plugin
     fi
 
     # Install
